@@ -2,62 +2,67 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Mini-Game: Instrumentos do Olodum</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafio Olodum</title>
     <style>
-        body { font-family: sans-serif; background: #FFD700; text-align: center; padding: 20px; }
+        body { font-family: sans-serif; background-color: #FFD700; text-align: center; padding: 20px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; max-width: 1000px; margin: 20px auto; }
         .card { background: white; border: 4px solid #d32f2f; border-radius: 12px; cursor: pointer; padding: 10px; transition: 0.3s; }
-        .card:hover { transform: scale(1.05); }
+        .card:hover { transform: scale(1.05); border-color: #000; }
         .card img { width: 100%; height: 150px; object-fit: contain; }
-        #overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); color:white; justify-content:center; align-items:center; z-index:100; }
-        .modal { background:white; color:black; padding:30px; border-radius:15px; max-width:450px; border: 8px solid; }
-        .btn { padding: 10px 20px; background: #333; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 20px; }
+        .card p { font-weight: bold; margin-top: 10px; }
+        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; }
+        .conteudo { background: white; padding: 30px; border-radius: 20px; max-width: 450px; text-align: center; border: 8px solid; }
+        .btn { padding: 10px 25px; background: #333; color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
-    <h1 style="color: #d32f2f;">🥁 Quem faz parte do Olodum?</h1>
+
+    <h1 style="color: #d32f2f;">🥁 Instrumentos do Olodum</h1>
+    <p>Clique para descobrir a origem do instrumento!</p>
+
     <div class="grid" id="grade"></div>
 
-    <div id="overlay" onclick="fechar()">
-        <div class="modal" id="caixa" onclick="event.stopPropagation()">
+    <div id="modal" onclick="fechar()">
+        <div class="conteudo" id="caixa-modal" onclick="event.stopPropagation()">
             <h2 id="titulo"></h2>
-            <p id="info" style="font-size: 1.1em;"></p>
+            <p id="texto" style="font-size: 1.2em; line-height: 1.5;"></p>
             <button class="btn" onclick="fechar()">VOLTAR</button>
         </div>
     </div>
 
 <script>
-    const lista = [
-        { n: "Surdo", status: true, img: "Surdo.png", d: "SIM! O coração do Olodum." },
-        { n: "Caixa", status: true, img: "Caixa.png", d: "SIM! Traz o motor do ritmo." },
-        { n: "Chocalho", status: true, img: "Chocalho.png", d: "SIM! Dá brilho ao som." },
-        { n: "Repique de Mão", status: true, img: "Repique de Mão.png", d: "SIM! Faz as chamadas." },
-        { n: "Timbau", status: true, img: "Timbal.png", d: "SIM! Sons agudos e estalados." },
-        { n: "Violino", status: false, img: "Violino.png", d: "NÃO! Instrumento europeu." },
-        { n: "Berimbau", status: false, img: "Berimbau.png", d: "NÃO! É da capoeira." },
-        { n: "Marimba", status: false, img: "Marimba.png", d: "NÃO! Xilofone melódico." },
-        { n: "Gongo Chinês", status: false, img: "Gongo Chines.png", d: "NÃO! Origem asiática." },
-        { n: "Violoncelo", status: false, img: "Cello.png", d: "NÃO! Instrumento de orquestra." },
-        { n: "Violão", status: false, img: "violão.png", d: "NÃO! Instrumento de cordas." },
-        { n: "Harpa", status: false, img: "Harpa.png", d: "NÃO! Instrumento delicado." }
+    const instrumentos = [
+        { n: "Surdo", s: true, i: "Surdo.png", d: "SIM! O coração do Olodum. Dita o grave que sentimos no peito." },
+        { n: "Caixa", s: true, i: "Caixa.png", d: "SIM! A caixa dá o motor rítmico. Adaptada de bandas militares." },
+        { n: "Chocalho", s: true, i: "Chocalho.png", d: "SIM! Traz o brilho e preenche o som entre as batidas." },
+        { n: "Repique de Mão", s: true, i: "Repique de Mão.png", d: "SIM! Instrumento que faz as chamadas e cortes rítmicos." },
+        { n: "Timbau", s: true, i: "Timbal.png", d: "SIM! Fundamental no Samba-Reggae, traz sons agudos e estalados." },
+        { n: "Violino", s: false, i: "Violino.png", d: "NÃO! Instrumento clássico europeu de cordas." },
+        { n: "Berimbau", s: false, i: "Berimbau.png", d: "NÃO! Símbolo da capoeira, não da bateria do Olodum." },
+        { n: "Marimba", s: false, i: "Marimba.png", d: "NÃO! Xilofone melódico de origem africana." },
+        { n: "Gongo", s: false, i: "Gongo Chines.png", d: "NÃO! Origem asiática. O Olodum usa metais como o Agogô." },
+        { n: "Cello", s: false, i: "Cello.png", d: "NÃO! Instrumento de orquestra, pesado demais para desfiles." },
+        { n: "Violão", s: false, i: "violão.png", d: "NÃO! Instrumento harmônico de cordas." },
+        { n: "Harpa", s: false, i: "Harpa.png", d: "NÃO! Instrumento de cordas antigo e delicado." }
     ];
 
     const grade = document.getElementById('grade');
-    lista.forEach(item => {
+    instrumentos.forEach(item => {
         const div = document.createElement('div');
         div.className = 'card';
-        div.innerHTML = `<img src="${item.i}" alt="${item.n}"><p>${item.n}</p>`;
+        // O "./" antes do nome da imagem força o GitHub a procurar na mesma pasta
+        div.innerHTML = `<img src="./${item.i}" alt="${item.n}"><p>${item.n}</p>`;
         div.onclick = () => {
-            document.getElementById('overlay').style.display='flex';
-            document.getElementById('titulo').innerText = item.s ? "✅ SIM!" : "❌ NÃO!";
-            document.getElementById('info').innerText = item.d;
-            document.getElementById('caixa').style.borderColor = item.s ? "#28a745" : "#d32f2f";
+            document.getElementById('modal').style.display = 'flex';
+            document.getElementById('titulo').innerText = item.s ? "✅ É DO OLODUM!" : "❌ NÃO É!";
+            document.getElementById('texto').innerText = item.d;
+            document.getElementById('caixa-modal').style.borderColor = item.s ? "#28a745" : "#d32f2f";
         };
         grade.appendChild(div);
     });
-    function fechar() { document.getElementById('overlay').style.display='none'; }
+
+    function fechar() { document.getElementById('modal').style.display = 'none'; }
 </script>
 </body>
 </html>
-
-
