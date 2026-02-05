@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Desafio Olodum: O Som do Pelô</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f7f7f7; text-align: center; padding: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; max-width: 1100px; margin: 30px auto; }
+        .card { background: white; border: 4px solid #d32f2f; border-radius: 15px; cursor: pointer; transition: 0.3s; padding: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .card:hover { transform: translateY(-5px); border-color: #ffcc00; }
+        .card img { width: 100%; height: 160px; object-fit: contain; border-radius: 8px; }
+        .card p { font-weight: bold; margin-top: 15px; font-size: 1.1em; color: #333; }
+        
+        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; }
+        .modal { background: white; padding: 40px; border-radius: 20px; max-width: 500px; width: 85%; text-align: center; border: 10px solid; }
+        .acerto { border-color: #28a745; }
+        .erro { border-color: #d32f2f; }
+        .btn { margin-top: 25px; padding: 12px 35px; background: #333; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 1.1em; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h1 style="color: #d32f2f; font-size: 2.5em;">🥁 Qual é do Olodum?</h1>
+    <p style="font-size: 1.2em;">Clique no instrumento para descobrir sua origem e se ele faz parte da banda!</p>
+
+    <div class="grid" id="grade"></div>
+
+    <div id="overlay" onclick="fechar()">
+        <div class="modal" id="modal-box" onclick="event.stopPropagation()">
+            <h2 id="titulo" style="font-size: 2em;"></h2>
+            <p id="info" style="font-size: 1.3em; line-height: 1.6; color: #444;"></p>
+            <button class="btn" onclick="fechar()">VOLTAR</button>
+        </div>
+    </div>
+
+<script>
+    const instrumentos = [
+        { nome: "Surdo", status: true, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6A7E0T0mBvTq0_8B6rE5h3p1nB-Z_H0B2jg&s", desc: "SIM! O Surdo dita o grave. Surgiu da adaptação de tambores africanos para o samba baiano." },
+        { nome: "Caixa", status: true, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0N7C0f9-uA6z_2GqVwzHjQGvWp9v6I-G_zI-kYA&s", desc: "SIM! A caixa de guerra dá o 'motor' do ritmo. Veio das bandas militares para o Pelourinho." },
+        { nome: "Chocalho", status: true, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_xV9oHjQGvWp9v6I-G_zI-kYA&s", desc: "SIM! O chocalho traz o brilho e preenche o som entre as batidas dos tambores." },
+        { nome: "Repique", status: true, img: "https://www.luen.com.br/wp-content/uploads/2021/05/11053.jpg", desc: "SIM! O repique faz as chamadas agudas que guiam os outros percussionistas." },
+        { nome: "Timbau", status: true, img: "https://http2.mlstatic.com/D_NQ_NP_899201-MLB44208460515_122020-O.jpg", desc: "SIM! Criado na Bahia com influências ancestrais, é tocado com as mãos para sons estalados." },
+        { nome: "Violino", status: false, img: "https://img.freepik.com/fotos-premium/violino-isolado-no-fundo-branco_326694-1180.jpg", desc: "NÃO! O violino é europeu e de cordas. O Olodum é focado em percussão de rua." },
+        { nome: "Berimbau", status: false, img: "https://m.media-amazon.com/images/I/41Dq9K9uK1L._AC_UF894,1000_QL80_.jpg", desc: "NÃO! Símbolo da capoeira, mas não faz parte da bateria clássica do Olodum." },
+        { nome: "Marimba", status: false, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Marimba_1.jpg/800px-Marimba_1.jpg", desc: "NÃO! Xilofone de origem africana, mas melódico demais para o bloco de rua." },
+        { nome: "Gongo", status: false, img: "https://m.media-amazon.com/images/I/718D-oA7DlL._AC_SL1500_.jpg", desc: "NÃO! O gongo é oriental. O Olodum usa apenas instrumentos de metal como o Agogô." },
+        { nome: "Violoncelo", status: false, img: "https://static.escolakids.uol.com.br/image/violoncelo.jpg", desc: "NÃO! Instrumento de orquestra, pesado demais para os desfiles no Pelourinho." },
+        { nome: "Harpa", status: false, img: "https://static.preparaenem.com.br/conteudo_legenda/8617882250974955f24f0c607ecb23e3.jpg", desc: "NÃO! Instrumento de cordas antigo e delicado." }
+    ];
+
+    const grade = document.getElementById('grade');
+    instrumentos.forEach(inst => {
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.innerHTML = `<img src="${inst.img}" alt="${inst.nome}"><p>${inst.nome}</p>`;
+        div.onclick = () => {
+            document.getElementById('overlay').style.display = 'flex';
+            document.getElementById('titulo').innerText = inst.status ? "✅ É DO OLODUM!" : "❌ NÃO É!";
+            document.getElementById('titulo').style.color = inst.status ? "#28a745" : "#d32f2f";
+            document.getElementById('info').innerText = inst.desc;
+            document.getElementById('modal-box').className = "modal " + (inst.status ? "acerto" : "erro");
+        };
+        grid.appendChild(div);
+    });
+
+    function fechar() { document.getElementById('overlay').style.display = 'none'; }
+</script>
+</body>
+</html>
